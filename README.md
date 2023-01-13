@@ -8,6 +8,10 @@ XMR-Mining-Container based on XMRig.
 docker build -t xmr-mining-container ./src/ 
 ```
 
+## Create the Configuration File
+
+Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
+
 ## Start the Docker Container
 
 ```bash
