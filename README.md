@@ -1,18 +1,18 @@
-# XMR-Mining-Container
+# container-xmr-mining
 
-A docker container setup to mine XMR based on XMRig.
+A Docker container setup to mine XMR based on XMRig.
 
-## Build the Docker Container
+## Build the Docker container
 
 ```bash
 docker build -t xmr-mining-container ./src/ 
 ```
 
-## Create the Configuration File
+## Create the configuration file
 
 Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
 
-## Start the Docker Container
+## Start the Docker container
 
 ```bash
 docker run -d --restart unless-stopped --name miner -v $(pwd)/config:/miner-config xmr-mining-container
