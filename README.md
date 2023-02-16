@@ -1,6 +1,14 @@
 # container-xmr-mining
 
-A Docker container setup to mine XMR based on XMRig.
+A Docker container setup to mine XMR based on [XMRig](https://github.com/xmrig).
+
+## Table of contents
+
+- [container-xmr-mining](#container-xmr-mining)
+  - [Table of contents](#table-of-contents)
+  - [Build the Docker container](#build-the-docker-container)
+  - [Create the configuration file](#create-the-configuration-file)
+  - [Start the Docker container](#start-the-docker-container)
 
 ## Build the Docker container
 
