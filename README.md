@@ -48,7 +48,7 @@ A Docker container setup to mine XMR based on [XMRig](https://github.com/xmrig).
 2. Start container
 
     ```bash
-    docker-compose up -d
+    docker-compose up -d --build
     ````
 
 3. Stop container
