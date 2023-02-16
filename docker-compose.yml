@@ -1,0 +1,19 @@
+version: '3'
+
+# service description
+services:
+
+  # watchtower service
+  xmr-miner:
+    build:
+      context: ./src
+      dockerfile: ./Dockerfile
+    container_name: xmr-miner
+    hostname: xmr-miner
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config:/miner-config:ro
+    labels:
+      # enbale watchtower updates
+      - "com.centurylinklabs.watchtower.enable=true"
