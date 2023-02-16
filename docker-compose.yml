@@ -11,6 +11,10 @@ services:
     container_name: xmr-miner
     hostname: xmr-miner
     restart: unless-stopped
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: "3.0"   # max cpu usage (1.0 equals 1 cpu core) 
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config:/miner-config:ro
