@@ -6,22 +6,53 @@ A Docker container setup to mine XMR based on [XMRig](https://github.com/xmrig).
 
 - [container-xmr-mining](#container-xmr-mining)
   - [Table of contents](#table-of-contents)
-  - [Build the Docker container](#build-the-docker-container)
-  - [Create the configuration file](#create-the-configuration-file)
-  - [Start the Docker container](#start-the-docker-container)
+  - [Setup](#setup)
+    - [Docker](#docker)
+    - [Docker Compose](#docker-compose)
 
-## Build the Docker container
+## Setup
 
-```bash
-docker build -t xmr-mining-container ./src/ 
-```
+### Docker
 
-## Create the configuration file
+0. Requirements
 
-Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
+   - Docker
 
-## Start the Docker container
+1. Build the Docker container
 
-```bash
-docker run -d --restart unless-stopped --name miner -v $(pwd)/config:/miner-config xmr-mining-container
-```
+    ```bash
+    docker build -t xmr-mining-container ./src/ 
+    ```
+
+2. Create the configuration file
+
+    Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
+
+3. Start the Docker container
+
+    ```bash
+    docker run -d --restart unless-stopped --name miner -v $(pwd)/config:/miner-config xmr-mining-container
+    ```
+
+### Docker Compose
+
+0. Requirements
+
+   - Docker
+   - Docker Compose
+
+1. Create the configuration file
+
+    Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
+
+2. Start container
+
+    ```bash
+    docker-compose up -d
+    ````
+
+3. Stop container
+
+    ```bash
+    docker-compose down
+    ```
