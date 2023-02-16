@@ -1,6 +1,6 @@
 # XMR-Mining-Container
 
-XMR-Mining-Container based on XMRig.
+A docker container setup to mine XMR based on XMRig.
 
 ## Build the Docker Container
 
