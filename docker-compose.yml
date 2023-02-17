@@ -5,9 +5,10 @@ services:
 
   # watchtower service
   xmr-miner:
-    build:
-      context: ./src
-      dockerfile: ./Dockerfile
+    image: ghcr.io/jonas-merkle/container-xmr-mining:master
+    #build:
+    #  context: ./src
+    #  dockerfile: ./Dockerfile
     container_name: xmr-miner
     hostname: xmr-miner
     restart: unless-stopped
