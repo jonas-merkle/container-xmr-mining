@@ -45,11 +45,14 @@ jobs:
             IMAGE_TAG="latest"
           fi
 
+          # Change to the src directory
+          cd src
+
           # Build and push the image
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --push \
-            --file ./src/Dockerfile \
+            --file ./Dockerfile \
             --tag ghcr.io/${{ github.repository }}/container-xmr-mining:$IMAGE_TAG .
 
     # Only run on push, schedule, or manual dispatch
