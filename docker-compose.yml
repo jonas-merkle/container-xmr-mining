@@ -3,7 +3,7 @@ services:
 
   # watchtower service
   xmr-miner:
-    image: ghcr.io/jonas-merkle/container-xmr-mining:master
+    image: ghcr.io/jonas-merkle/container-xmr-mining:latest
     #build:
     #  context: ./src
     #  dockerfile: ./Dockerfile
