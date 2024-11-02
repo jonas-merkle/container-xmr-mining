@@ -1,22 +1,51 @@
-# service description
-services:
+# Docker Compose configuration for setting up an XMR Miner container
+#
+# This configuration pulls the latest XMR Miner image from the specified repository
+# and includes options for resource limits, logging, and automatic updates using Watchtower.
+# Volume mounting is configured for time and configuration persistence.
 
-  # watchtower service
+services:
   xmr-miner:
-    image: ghcr.io/jonas-merkle/container-xmr-mining:latest
-    #build:
-    #  context: ./src
-    #  dockerfile: ./Dockerfile
-    container_name: xmr-miner
-    hostname: xmr-miner
-    restart: unless-stopped
-    #deploy:
-    #  resources:
-    #    limits:
-    #      cpus: "3.0"   # max cpu usage (1.0 equals 1 cpu core) 
+    image: ghcr.io/jonas-merkle/container-xmr-mining:latest   # Pull the latest version of the XMR Miner image
+    container_name: xmr-miner                                 # Name of the XMR Miner container
+    hostname: xmr-miner                                       # Hostname for the XMR Miner container
+
+    restart: unless-stopped                                   # Restart the container unless manually stopped
+
+    # Optional: Resource limits for CPU usage
+    # Uncomment and set limits as needed
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "3.0"                                       # Limit CPU usage (1.0 = 1 CPU core)
+
+    # Logging configuration for XMR Miner container
+    logging:
+      driver: "json-file"                                     # Use the default json-file logging driver
+      options:
+        max-size: "100m"                                      # Maximum log file size before rotation (100 MB)
+        max-file: "10"                                        # Maximum number of log files to retain (10)
+
+    # Security options for Redis container
+    security_opt:
+      - no-new-privileges:true                                # Prevent container processes from gaining additional privileges
+
+    # Volume configuration for time and configuration persistence
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./config:/miner-config:ro
+      - /etc/localtime:/etc/localtime:ro                      # Synchronize time with host
+      - ./config:/miner-config:ro                             # Mount configuration directory in read-only mode
+
+    # Health check configuration to verify XMR Miner readiness
+    healthcheck:
+      test: 
+        [
+          "CMD-SHELL",                                        # Use shell command for health check
+          "curl -f http://localhost:4048/1/summary || exit 1" # Check if XMR Miner is running
+        ]
+      interval: 30s                                           # Time between health check attempts
+      timeout: 10s                                            # Time to wait for a response
+      retries: 3                                              # Number of retries before marking as unhealthy
+
+    # Container labels for additional metadata
     labels:
-      # enbale watchtower updates
-      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=true"          # Enable automatic updates with Watchtower
