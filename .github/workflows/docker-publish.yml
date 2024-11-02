@@ -4,16 +4,24 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - version-*
+  workflow_dispatch:
+    # Allows the workflow to be triggered manually for any branch
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: false
+        default: 'develop'
   schedule:
-    # Runs at the first of every month at 1 am (UTC)
-    - cron: '0 1 1 * *'
+    # Runs every day at midnight UTC
+    - cron: '0 0 * * *'
 
 jobs:
   build:
-    # Job that builds the Docker image on pushes to main and develop
+    # Job that builds the Docker image
+    # Runs on push to main, tags, or manually triggered for develop branch
+    if: github.ref_name == 'main' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' && github.event.inputs.branch == 'develop'
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the code from the repository
