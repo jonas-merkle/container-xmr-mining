@@ -8,8 +8,8 @@ on:
     tags:
       - version-*
   schedule:
-    # Runs every day at midnight UTC
-    - cron: '0 0 * * *'
+    # Runs at the first of every month at 1 am (UTC)
+    - cron: '0 1 1 * *'
 
 jobs:
   build:
