@@ -50,7 +50,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:temp
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          outputs: type=docker,dest=image.tar
+          outputs: type=oci,dest=image.tar  # Export as OCI to support multi-platform
 
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v3
