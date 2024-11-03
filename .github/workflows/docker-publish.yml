@@ -39,7 +39,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build Docker image
+      - name: Build and export Docker image as artifact
         id: build-and-cache
         uses: docker/build-push-action@v4
         with:
@@ -50,14 +50,13 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:temp
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          outputs: type=docker,dest=image.tar
 
-      - name: Export Docker image as artifact
-        run: docker save ghcr.io/${{ github.repository }}:temp | gzip > image.tar.gz
       - name: Upload Docker image artifact
         uses: actions/upload-artifact@v3
         with:
           name: docker-image
-          path: image.tar.gz
+          path: image.tar
 
   publish:
     needs: build
@@ -80,8 +79,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: docker-image
+
       - name: Load Docker image
-        run: docker load -i image.tar.gz
+        run: docker load -i image.tar
 
       - name: Extract version from tag
         if: startsWith(github.ref, 'refs/tags/version-')
