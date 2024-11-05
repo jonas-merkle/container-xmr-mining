@@ -1,93 +1,194 @@
 # container-xmr-mining
 
-A Docker container setup to mine XMR based on [XMRig](https://github.com/xmrig).
+A Docker container setup for mining Monero (XMR) using [XMRig](https://github.com/xmrig). This repository provides a simple Docker and Docker Compose setup to facilitate a fast and efficient mining experience.
 
-## Table of contents
+## Table of Contents
 
 - [container-xmr-mining](#container-xmr-mining)
-  - [Table of contents](#table-of-contents)
+  - [Table of Contents](#table-of-contents)
+  - [Requirements](#requirements)
   - [Setup](#setup)
-    - [Docker](#docker)
-    - [Docker Compose](#docker-compose)
+    - [Using only the Docker image](#using-only-the-docker-image)
+    - [Using Docker Compose](#using-docker-compose)
+      - [Configuration](#configuration)
+  - [Running the Project](#running-the-project)
+  - [License](#license)
+
+## Requirements
+
+- Docker
+- Docker Compose
 
 ## Setup
 
-### Docker
+### Using only the Docker image
 
-0. Requirements
+1. Pull the Docker image:
 
-   - Docker
-
-1. Build the Docker container
-
-    ```bash
-    docker build -t xmr-mining-container ./src/ 
+    ```sh
+    docker pull ghcr.io/jonas-merkle/container-xmr-mining:latest
     ```
 
-2. Create the configuration file
+2. Run the Docker container:
 
-    Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
-
-3. Start the Docker container
-
-    ```bash
-    docker run -d --restart unless-stopped --name miner -v $(pwd)/config:/miner-config xmr-mining-container
+    ```sh
+    docker run -d --name xmr-miner -v $(pwd)/config:/miner-config:ro ghcr.io/jonas-merkle/container-xmr-mining:latest
     ```
 
-### Docker Compose
+### Using Docker Compose
 
-0. Requirements
+1. Clone the repository:
 
-   - Docker
-   - Docker Compose
-
-1. Create the configuration file
-
-    Create based on the `./config/config_demo.json` a file called `./config/config.json` containing your custom settings.
-
-2. Limit the cpu usage
-
-    To limit the cpu usage remove the `#` at the beginning of the following lines in the `docker-compose.yml` file:
-
-    ```yml
-        #deploy:
-        #  resources:
-        #    limits:
-        #      cpus: "3.0"   # max cpu usage (1.0 equals 1 cpu core) 
+    ```sh
+    git clone https://github.com/jonas-merkle/container-xmr-mining.git
+    cd container-xmr-mining
     ```
 
-3. Build the container local
+2. Copy the demo configuration file:
 
-    If you ar not using a `linux x86` containerhost or want to build the container on startup the remove the `#` at the beginning of the following lines in the `docker-compose.yml` file:
-
-    ```yml
-        #build:
-        #  context: ./src
-        #  dockerfile: ./Dockerfile
+    ```sh
+    cp ./config/config_demo.json ./config/config.json
     ```
 
-    And add add a `#` at the beginning of the following line:
+3. Edit the `config.json` file to suit your needs:
 
-    ```yml
-        image: ghcr.io/jonas-merkle/container-xmr-mining:master
+    ```sh
+    nano ./config/config.json
     ```
 
-4. Start container
+4. Start the Docker Compose setup:
 
-    The default start command is:
-
-    ```bash
+    ```sh
     docker-compose up -d
-    ````
-
-    If you changed something in section 4. of this tutorial the use this command to start the container:
-
-    ```bash
-    docker-compose up -d --build
-    ````
-
-5. Stop container
-
-    ```bash
-    docker-compose down
     ```
+
+#### Configuration
+
+The XMRig tool must be configured before the first run. Follow these steps to set up the tool:
+
+1. Copy the Demo Configuration File:
+
+    ```sh
+    cp ./config/config_demo.json ./config/config.json
+    ```
+
+2. Edit the Configuration File:
+    Open the `config.json` file in your preferred text editor:
+
+    ```sh
+    nano ./config/config.json
+    ```
+
+3. Essential Configuration Settings:
+    - Pool Information:
+
+        ```json
+        "url": "pool.minexmr.com:4444"
+        ```
+
+    - Wallet Address:
+
+        ```json
+        "user": "YOUR_WALLET_ADDRESS"
+        ```
+
+4. Advanced Configuration Options:
+    - Worker ID (Optional):
+
+        ```json
+        "rig-id": "my-miner-01"
+        ```
+
+    - Algorithm Selection:
+
+        ```json
+        "algo": "rx/0"
+        ```
+
+    - Threads Configuration:
+
+        ```json
+        "threads": 4
+        ```
+
+    - Background Mode:
+
+        ```json
+        "background": true
+        ```
+
+    - Max CPU Usage:
+
+        ```json
+        "max-cpu-usage": 75
+        ```
+
+    - Donate Level:
+
+        ```json
+        "donate-level": 1
+        ```
+
+5. Logging and Monitoring:
+    - Log File:
+
+        ```json
+        "log-file": "/miner-config/xmrig.log"
+        ```
+
+    - Print Time Interval:
+
+        ```json
+        "print-time": 60
+        ```
+
+6. Tuning for Optimal Performance:
+    - Huge Pages:
+
+        ```json
+        "huge-pages": true
+        ```
+
+    - Affinity:
+
+        ```json
+        "cpu-affinity": [0, 2, 4, 6]
+        ```
+
+For more detailed information on configuring XMRig, refer to the [XMRig Configuration Guide](./doc/XMRig-Configuration-Guide.md). Configuration
+
+The XMRig tool must be configured before the first run. Have a look at the short [documentation](./doc/XMRig-Configuration-Guide.md) on how to set up the tool.
+
+## Running the Project
+
+1. Ensure Docker and Docker Compose are installed on your system.
+
+2. Clone the repository and navigate to the project directory:
+
+    ```sh
+    git clone https://github.com/jonas-merkle/container-xmr-mining.git
+    cd container-xmr-mining
+    ```
+
+3. Copy and edit the configuration file:
+
+    ```sh
+    cp ./config/config_demo.json ./config/config.json
+    nano ./config/config.json
+    ```
+
+4. Start the Docker Compose setup:
+
+    ```sh
+    docker-compose up -d
+    ```
+
+5. Check the logs to ensure the miner is running correctly:
+
+    ```sh
+    docker-compose logs -f
+    ```
+
+## License
+
+This project is licensed under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.html) (LGPLv3). You are free to use, modify, and distribute this software under the LGPLv3 terms. For more details, see the [LICENSE](./LICENSE) file.
