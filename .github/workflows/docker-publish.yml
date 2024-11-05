@@ -1,68 +1,22 @@
-name: Docker Build, Publish, and Sign
+name: Docker Build and Publish
 
 on:
   push:
     branches:
-      - main  # Automatically build on all commits to main
+      - main
     tags:
       - version-*  # Trigger publish workflow on new version tags
+  schedule:
+    - cron: '0 0 1 * *'  # Run once a month on the main branch
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to run the workflow on (develop only)'
+        description: 'Branch to run the workflow on'
         required: false
-        default: 'develop'
-  schedule:
-    - cron: '0 0 1 * *'
+        default: 'main'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          driver-opts: network=host
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Build and export Docker image as artifact
-        id: build-and-cache
-        uses: docker/build-push-action@v4
-        with:
-          context: ./src
-          file: ./src/Dockerfile
-          push: false
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ github.repository }}:temp
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          outputs: type=oci,dest=image.tar  # Export as OCI to support multi-platform
-
-      - name: ls -al
-        run: ls -al
-
-      - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: image.tar
-
-  publish:
-    needs: build
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -78,21 +32,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Download Docker image artifact
-        uses: actions/download-artifact@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
         with:
-          name: docker-image
+          driver-opts: network=host
 
-      - name: ls -al
-        run: ls -al
-
-      - name: Load Docker image
-        run: docker load -i image.tar
-
-      - name: Extract version from tag
-        if: startsWith(github.ref, 'refs/tags/version-')
+      - name: Extract version tag or branch name
         id: version
-        run: echo "version=${GITHUB_REF#refs/tags/version-}" >> $GITHUB_ENV
+        run: |
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/main ]]; then
+            echo "tag=${{ github.event.inputs.branch }}"" >> $GITHUB_ENV
+            echo "tag_latest=true" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" =~ ^refs/tags/version- ]]; then
+            version="${GITHUB_REF#refs/tags/version-}"
+            echo "tag=${version}" >> $GITHUB_ENV
+            echo "tag_latest=true" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ github.event.inputs.branch }}" >> $GITHUB_ENV
+            echo "tag_latest=false" >> $GITHUB_ENV
+          else
+            echo "tag_latest=true" >> $GITHUB_ENV
+          fi
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
@@ -101,19 +61,39 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Tag and push Docker image
-        run: |
-          docker tag ghcr.io/${{ github.repository }}:temp ghcr.io/${{ github.repository }}:${{ env.version || 'latest' }}
-          docker tag ghcr.io/${{ github.repository }}:temp ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ env.version || 'latest' }}
-          docker push ghcr.io/${{ github.repository }}:latest
+      - name: Build and push Docker image with "latest" tag
+        uses: docker/build-push-action@v4
+        if: ${{ env.tag_tatest }} == 'true'
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ env.tag }}
+            ghcr.io/${{ github.repository }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Docker image without "latest" tag
+        uses: docker/build-push-action@v4
+        if: ${{ env.tag_tatest }} == 'false'
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ env.tag }}
+            ghcr.io/${{ github.repository }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Sign the published Docker images
         if: ${{ github.event_name != 'pull_request' }}
         env:
           TAGS: |
-            ghcr.io/${{ github.repository }}:${{ env.version || 'latest' }}
+            ghcr.io/${{ github.repository }}:${{ env.tag }}
             ghcr.io/${{ github.repository }}:latest
-          DIGEST: ${{ steps.build-and-cache.outputs.digest }}
         run: |
-          echo "${TAGS}" | xargs -I {} cosign sign --yes --identity-token ${{ secrets.GITHUB_TOKEN }} {}@${DIGEST}
+          echo "${TAGS}" | xargs -I {} cosign sign --yes --identity-token ${{ secrets.GITHUB_TOKEN }} {}
