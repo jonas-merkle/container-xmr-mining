@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies for building xmrig
 RUN apt-get update && apt-get install -y \
-    wget git build-essential cmake automake libtool autoconf \
+    wget ca-certificates git build-essential cmake automake libtool autoconf \
     --no-install-recommends && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -24,10 +24,11 @@ FROM ubuntu:latest AS runtime
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install runtime dependencies
-#RUN apt-get update && apt-get install -y \
-#    libhwloc15 libuv1 libssl1.1 \
-#    --no-install-recommends && \
-#    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    #libhwloc15 libuv1 libssl1.1 \
+    --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the built xmrig binary from the builder stage
 COPY --from=builder /xmrig/build/xmrig /usr/local/bin/xmrig
