@@ -12,6 +12,7 @@ A Docker container setup for mining Monero (XMR) using [XMRig](https://github.co
     - [Using Docker Compose](#using-docker-compose)
       - [Configuration](#configuration)
   - [Running the Project](#running-the-project)
+  - [Security Notes](#security-notes)
   - [License](#license)
 
 ## Requirements
@@ -189,6 +190,15 @@ The XMRig tool must be configured before the first run. Have a look at the short
     docker-compose logs -f
     ```
 
+## Security Notes
+
+- **Environment Variables**: Ensure that `.env` files are not shared or tracked in version control, as they may contain sensitive information such as API tokens or credentials.
+- **Sensitive Files**: Always keep sensitive files like `.env` secure and ensure they are not exposed publicly.
+
 ## License
 
-This project is licensed under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.html) (LGPLv3). You are free to use, modify, and distribute this software under the LGPLv3 terms. For more details, see the [LICENSE](./LICENSE) file.
+This project is licensed under the [**GNU Lesser General Public License v3.0**](https://www.gnu.org/licenses/lgpl-3.0.html) (LGPLv3).
+It is distributed "as is", without warranty of any kind.
+You are free to use, modify, and distribute this software under the terms specified in the LGPLv3.
+
+See the [LICENSE](./LICENSE) file for more detailed information.
