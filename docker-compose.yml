@@ -6,7 +6,7 @@
 
 services:
   xmr-miner:
-    image: ghcr.io/jonas-merkle/container-xmr-mining:latest   # Pull the latest version of the XMR Miner image
+    image: ghcr.io/jonas-merkle/container-xmr-mining:main     # Pull the latest version of the XMR Miner image
     #build:
     #  context: ./src
     #  dockerfile: ./Dockerfile
