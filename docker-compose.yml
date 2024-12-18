@@ -36,7 +36,7 @@ services:
     # Volume configuration for time and configuration persistence
     volumes:
       - /etc/localtime:/etc/localtime:ro                      # Synchronize time with host
-      - ./config:/miner-config:ro                             # Mount configuration directory in read-only mode
+      - ./config/config.json:/usr/local/bin/config.json:ro    # Mount configuration directory in read-only mode
 
     # Health check configuration to verify XMR Miner readiness
     healthcheck:
