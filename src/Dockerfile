@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies for building xmrig
 RUN apt-get update && apt-get install -y \
-    wget ca-certificates git build-essential cmake automake libtool autoconf \
+    wget ca-certificates git build-essential cmake automake libtool libssl-dev autoconf \
     --no-install-recommends && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
