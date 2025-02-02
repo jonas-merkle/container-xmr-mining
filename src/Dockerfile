@@ -6,15 +6,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies for building xmrig
 RUN apt-get update && apt-get install -y \
-    wget ca-certificates git build-essential cmake automake libtool libssl-dev libuv1-dev autoconf \
+    wget ca-certificates git build-essential cmake automake libtool libssl-dev libuv1-dev libhwloc-dev autoconf \
     --no-install-recommends && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Clone the xmrig repository and build it
 WORKDIR /xmrig
 RUN git clone https://github.com/xmrig/xmrig.git . && \
-    mkdir build && cd scripts && ./build_deps.sh && cd ../build && \
-    cmake .. -DXMRIG_DEPS=scripts/deps && \
+    mkdir build && cd build && \
+    cmake .. && \
     make -j$(nproc)
 
 # Create a minimal runtime image
@@ -26,7 +26,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    #libhwloc15 libuv1 libssl1.1 \
+    libssl-dev libuv1-dev libhwloc-dev\
     --no-install-recommends && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
